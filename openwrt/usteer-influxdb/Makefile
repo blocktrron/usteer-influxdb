@@ -19,13 +19,18 @@ endef
 define Package/usteer-influxdb
   SECTION:=net
   CATEGORY:=Network
-  DEPENDS:=+libubox +libubus +libblobmsg-json
+  DEPENDS:=+libubox +libubus +libblobmsg-json +libuci
   TITLE:=OpenWrt AP roaming assist daemon InfluxDB data exporter
 endef
 
+define Package/usteer-influxdb/conffiles
+/etc/config/usteer-influxdb
+endef
+
 define Package/usteer-influxdb/install
-	$(INSTALL_DIR) $(1)/usr/bin
-	$(CP) $(PKG_BUILD_DIR)/usteer-influxdb $(1)/usr/bin
+	$(INSTALL_DIR) $(1)/usr/bin $(1)/etc/config
+	$(CP) $(PKG_BUILD_DIR)/files/usteer-influxdb.config $(1)/etc/config/usteer-influxdb
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/usteer-influxdb $(1)/usr/bin
 endef
 
 $(eval $(call BuildPackage,usteer-influxdb))
