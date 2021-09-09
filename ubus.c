@@ -5,6 +5,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <time.h>
 
 #include "ubus.h"
 
@@ -61,6 +62,7 @@ struct blobmsg_policy usteer_event_select_reason_policy[USTEER_EVENT_SELECT_REAS
 static char *usteer_influxdb_get_submission(const char *ev_type, struct blob_attr **tb, struct blob_attr **tb_remote, struct blob_attr **tb_select_reason) {
 	char out_buf[2048];
 	char tmp_buf[64];
+	time_t tstamp;
 	int i;
 
 	memset(out_buf, 0, sizeof(char) * 2048);
@@ -113,6 +115,10 @@ static char *usteer_influxdb_get_submission(const char *ev_type, struct blob_att
 		snprintf(tmp_buf, 64, ",signal_remote=%d", blobmsg_get_u32(tb_remote[USTEER_EVENT_NODE_STATUS_SIGNAL]));
 		strcat(out_buf, tmp_buf);
 	}
+
+	time(&tstamp);
+	snprintf(tmp_buf, 64, " %ld", tstamp);
+	strcat(out_buf, tmp_buf);
 
 	return strdup(out_buf);
 }
