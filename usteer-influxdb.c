@@ -30,31 +30,39 @@ static int usteer_influxdb_config_load()
 	uci_sec = uci_lookup_section(uci_ctx, uci_pkg, "settings");
 
 	cptr = uci_lookup_option_string(uci_ctx, uci_sec, "host");
-	if (cptr)
-		config.host = strdup(cptr);
+	if (!cptr)
+		goto out_err;
+	config.host = strdup(cptr);
 
 	cptr = uci_lookup_option_string(uci_ctx, uci_sec, "token");
-	if (cptr)
-		config.token = strdup(cptr);
+	if (!cptr)
+		goto out_err;
+	config.token = strdup(cptr);
 
 	cptr = uci_lookup_option_string(uci_ctx, uci_sec, "organization");
-	if (cptr)
-		config.organization = strdup(cptr);
+	if (!cptr)
+		goto out_err;
+	config.organization = strdup(cptr);
 
 	cptr = uci_lookup_option_string(uci_ctx, uci_sec, "bucket");
-	if (cptr)
-		config.bucket = strdup(cptr);
+	if (!cptr)
+		goto out_err;
+	config.bucket = strdup(cptr);
 
 out:
 	uci_free_context(uci_ctx);
 	return ret;
+
+out_err:
+	return 1;
 }
 
 int main(int argc, char *argv[])
 {
 	struct ubus_context *ubus_ctx;
 
-	usteer_influxdb_config_load();
+	if (usteer_influxdb_config_load())
+		return 1;
 
 	ubus_ctx = ubus_connect(NULL);
 	uloop_init();
