@@ -19,7 +19,7 @@ endef
 define Package/usteer-influxdb
   SECTION:=net
   CATEGORY:=Network
-  DEPENDS:=+libubox +libubus +libblobmsg-json +libuci
+  DEPENDS:=+libubox +libubus +libblobmsg-json +libuci +libuclient
   TITLE:=OpenWrt AP roaming assist daemon InfluxDB data exporter
 endef
 

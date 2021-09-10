@@ -8,8 +8,14 @@
 #include <time.h>
 
 #include "ubus.h"
+#include "submission.h"
+#include "usteer-influxdb.h"
 
 #define USTEER_OBJECT_NAME	"usteer"
+
+extern struct ui_settings config;
+
+char *submission_queue;
 
 enum {
 	USTEER_EVENT_NODE,
@@ -123,6 +129,34 @@ static char *usteer_influxdb_get_submission(const char *ev_type, struct blob_att
 	return strdup(out_buf);
 }
 
+static void usteer_influxdb_submit() {
+	static char token_buf[1024];
+	snprintf(token_buf, 1024, "Token %s", config.token);
+	static struct uclient_header headers[1] = {
+		{ .name = "Authorization", .value = token_buf }
+	};
+	static char url_buf[1024];
+
+	snprintf(url_buf, 1024, "%s/api/v2/write?org=%s&bucket=%s&precision=s", config.host, config.organization, config.bucket);
+	usteer_influxdb_start_submission(url_buf, headers, 1);
+}
+
+static void usteer_influxdb_ubus_add_submission(char *subs) {
+	char *tmpbuf;
+	int bufsize;
+	if (submission_queue == NULL) {
+		submission_queue = strdup(subs);
+		return;
+	}
+
+	bufsize = sizeof(char) * (strlen(submission_queue) + strlen(subs) + 2);	/* Newline char + NULL terminator */
+	submission_queue = realloc(submission_queue, bufsize);
+
+	tmpbuf = strdup(submission_queue);
+	snprintf(submission_queue, bufsize, "%s\n%s", tmpbuf, subs);
+	free(tmpbuf);
+}
+
 static int usteer_ubus_event_cb(struct ubus_context *ctx, struct ubus_object *obj,
 				struct ubus_request_data *req, const char *method,
 				struct blob_attr *msg) {
@@ -158,6 +192,7 @@ static int usteer_ubus_event_cb(struct ubus_context *ctx, struct ubus_object *ob
 
 	if (submission_str) {
 		printf("%s\n", submission_str);
+		usteer_influxdb_ubus_add_submission(submission_str);
 		free(submission_str);
 	}
 
@@ -224,6 +259,8 @@ void usteer_influxdb_register_events(struct ubus_context *ctx)
 	static struct ubus_event_handler handler = {
 	    .cb = usteer_influxdb_event_handler
 	};
+
+	usteer_influxdb_submit();
 
 	ubus_register_event_handler(ctx, &handler, "ubus.object.add");
 
