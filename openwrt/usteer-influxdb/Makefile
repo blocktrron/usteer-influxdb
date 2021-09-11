@@ -28,8 +28,9 @@ define Package/usteer-influxdb/conffiles
 endef
 
 define Package/usteer-influxdb/install
-	$(INSTALL_DIR) $(1)/usr/bin $(1)/etc/config
+	$(INSTALL_DIR) $(1)/usr/bin $(1)/etc/config $(1)/etc/init.d
 	$(CP) $(PKG_BUILD_DIR)/files/usteer-influxdb.config $(1)/etc/config/usteer-influxdb
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/files/usteer-influxdb.init $(1)/etc/init.d/usteer-influxdb
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/usteer-influxdb $(1)/usr/bin
 endef
 
