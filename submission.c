@@ -30,7 +30,6 @@ int submission_headers_num;
 
 
 static void request_done(struct uclient *cl, int err_code) {
-	printf ("Status %d - Error %d\n", cl->status_code, cl->error_code);
 	uclient_disconnect(cl);
 	request_progress = 0;
 	free(submission_queue);
@@ -43,7 +42,6 @@ static void header_done_cb(struct uclient *cl) {
 }
 
 static void read_cb(struct uclient *cl) {
-	printf("READ\n");
 	return;
 }
 
