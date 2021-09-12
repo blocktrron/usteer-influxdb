@@ -34,7 +34,7 @@ static void request_done(struct uclient *cl, int err_code) {
 	request_progress = 0;
 	free(submission_queue);
 	submission_queue = NULL;
-	uloop_timeout_set(&submission_timer, 10 * 1000);
+	uloop_timeout_set(&submission_timer, TIMEOUT_MSEC);
 }
 
 static void header_done_cb(struct uclient *cl) {
@@ -101,7 +101,7 @@ int post_url(const char *url, struct uclient_header *headers, int num_headers, c
 	if (ssl_ctx && ssl_ops)
 		uclient_http_set_ssl_ctx(cl, ssl_ops, ssl_ctx, 1);
 
-	cl->timeout_msecs = 10 * 1000;
+	cl->timeout_msecs = TIMEOUT_MSEC;
 	cl->priv = &d;
 	if (uclient_set_timeout(cl, TIMEOUT_MSEC)) {
 			goto err;
@@ -143,7 +143,7 @@ static void
 usteer_influxdb_start_submission_cb(struct uloop_timeout *timeout)
 {
 	if (submission_queue == NULL) {
-		uloop_timeout_set(&submission_timer, 10 * 1000);
+		uloop_timeout_set(&submission_timer, TIMEOUT_MSEC);
 		return;
 	}
 	post_url(submission_url, submission_headers, submission_headers_num, submission_queue);
