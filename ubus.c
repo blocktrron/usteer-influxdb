@@ -196,7 +196,7 @@ static int usteer_ubus_event_cb(struct ubus_context *ctx, struct ubus_object *ob
 	struct blob_attr *tb_select_reason[USTEER_EVENT_SELECT_REASON_LEN];
 
 	memset(tb_remote, 0, sizeof(tb_remote));
-	memset(tb_remote, 0, sizeof(tb_local));
+	memset(tb_local, 0, sizeof(tb_local));
 
 	blobmsg_parse(usteer_event_policy, __USTEER_EVENT_MAX, tb, blobmsg_data(msg), blobmsg_data_len(msg));
 	if (tb[USTEER_EVENT_NODE_LOCAL]) {
