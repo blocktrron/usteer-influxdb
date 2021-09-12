@@ -164,7 +164,7 @@ static void usteer_influxdb_submit() {
 	};
 	static char url_buf[1024];
 
-	snprintf(url_buf, 1024, "%s/api/v2/write?org=%s&bucket=%s&precision=ms", config.host, config.organization, config.bucket);
+	snprintf(url_buf, 1024, "%s/write?org=%s&bucket=%s&precision=ms", config.api_root, config.organization, config.bucket);
 	usteer_influxdb_start_submission(url_buf, headers, 1);
 }
 
