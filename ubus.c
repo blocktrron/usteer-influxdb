@@ -5,7 +5,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <time.h>
+#include <sys/time.h>
 
 #include "ubus.h"
 #include "submission.h"
@@ -66,9 +66,10 @@ struct blobmsg_policy usteer_event_select_reason_policy[USTEER_EVENT_SELECT_REAS
 };
 
 static char *usteer_influxdb_get_submission(const char *ev_type, struct blob_attr **tb, struct blob_attr **tb_remote, struct blob_attr **tb_select_reason) {
+	unsigned long long millisecondsSinceEpoch;
 	char out_buf[2048];
 	char tmp_buf[64];
-	time_t tstamp;
+	struct timeval tv;
 	int i;
 
 	memset(out_buf, 0, sizeof(char) * 2048);
@@ -122,8 +123,11 @@ static char *usteer_influxdb_get_submission(const char *ev_type, struct blob_att
 		strcat(out_buf, tmp_buf);
 	}
 
-	time(&tstamp);
-	snprintf(tmp_buf, 64, " %ld", tstamp);
+
+	gettimeofday(&tv, NULL);
+	millisecondsSinceEpoch = (unsigned long long)(tv.tv_sec) * 1000 +
+				 (unsigned long long)(tv.tv_usec) / 1000;
+	snprintf(tmp_buf, 64, " %llu", millisecondsSinceEpoch);
 	strcat(out_buf, tmp_buf);
 
 	return strdup(out_buf);
@@ -137,7 +141,7 @@ static void usteer_influxdb_submit() {
 	};
 	static char url_buf[1024];
 
-	snprintf(url_buf, 1024, "%s/api/v2/write?org=%s&bucket=%s&precision=s", config.host, config.organization, config.bucket);
+	snprintf(url_buf, 1024, "%s/api/v2/write?org=%s&bucket=%s&precision=ms", config.host, config.organization, config.bucket);
 	usteer_influxdb_start_submission(url_buf, headers, 1);
 }
 
