@@ -29,6 +29,11 @@ static int usteer_influxdb_config_load()
 
 	uci_sec = uci_lookup_section(uci_ctx, uci_pkg, "settings");
 
+	cptr = uci_lookup_option_string(uci_ctx, uci_sec, "host");
+	if (!cptr)
+		goto out_err;
+	config.host = strdup(cptr);
+
 	cptr = uci_lookup_option_string(uci_ctx, uci_sec, "api_root");
 	if (!cptr)
 		goto out_err;

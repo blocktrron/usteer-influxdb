@@ -83,6 +83,10 @@ static char *usteer_influxdb_get_submission(const char *ev_type, struct blob_att
 
 	strcpy(out_buf, ev_type);
 
+	snprintf(tmp_buf, 64, ",host=%s", config.host);
+	strcat(out_buf, tmp_buf);
+
+
 	if (tb[USTEER_EVENT_NODE]) {
 		strcat(out_buf, ",");
 		strcat(out_buf, "local_node=");
