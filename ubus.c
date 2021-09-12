@@ -78,21 +78,53 @@ static char *usteer_influxdb_get_submission(const char *ev_type, struct blob_att
 
 	memset(out_buf, 0, sizeof(char) * 2048);
 
-	if (!tb[USTEER_EVENT_SIGNAL])
+	if (!tb[USTEER_EVENT_SIGNAL] || !tb[USTEER_EVENT_STA])
 		return NULL;
 
 	strcpy(out_buf, ev_type);
 
-	if (tb[USTEER_EVENT_STA]) {
+	if (tb[USTEER_EVENT_NODE]) {
 		strcat(out_buf, ",");
-		strcat(out_buf, "sta=");
-		strcat(out_buf, blobmsg_get_string(tb[USTEER_EVENT_STA]));
+		strcat(out_buf, "local_node=");
+		strcat(out_buf, blobmsg_get_string(tb[USTEER_EVENT_NODE]));
+	}
+
+	if (tb_remote[USTEER_EVENT_NODE_STATUS_NAME]) {
+		strcat(out_buf, ",");
+		strcat(out_buf, "remote_node=");
+		strcat(out_buf, blobmsg_get_string(tb_remote[USTEER_EVENT_NODE_STATUS_NAME]));
+	}
+
+	if (tb_local[USTEER_EVENT_NODE_STATUS_BSSID]) {
+		strcat(out_buf, ",");
+		strcat(out_buf, "local_node_bssid=");
+		strcat(out_buf, blobmsg_get_string(tb_local[USTEER_EVENT_NODE_STATUS_BSSID]));
+	}
+
+	if (tb_remote[USTEER_EVENT_NODE_STATUS_BSSID]) {
+		strcat(out_buf, ",");
+		strcat(out_buf, "remote_node_bssid=");
+		strcat(out_buf, blobmsg_get_string(tb_remote[USTEER_EVENT_NODE_STATUS_BSSID]));
+	}
+
+	if (tb_local[USTEER_EVENT_NODE_STATUS_FREQUENCY]) {
+		snprintf(tmp_buf, 64, ",local_node_frequency=%d", blobmsg_get_u32(tb_local[USTEER_EVENT_NODE_STATUS_FREQUENCY]));
+		strcat(out_buf, tmp_buf);
+	}
+
+	if (tb_remote[USTEER_EVENT_NODE_STATUS_FREQUENCY]) {
+		snprintf(tmp_buf, 64, ",remote_node_frequency=%d", blobmsg_get_u32(tb_remote[USTEER_EVENT_NODE_STATUS_FREQUENCY]));
+		strcat(out_buf, tmp_buf);
+	}
+
+	if (tb[USTEER_EVENT_STA]) {
+		snprintf(tmp_buf, 64, " sta=\"%s\"", blobmsg_get_string(tb[USTEER_EVENT_STA]));
+		strcat(out_buf, tmp_buf);
 	}
 
 	if (tb[USTEER_EVENT_REASON]) {
-		strcat(out_buf, ",");
-		strcat(out_buf, "reason=");
-		strcat(out_buf, blobmsg_get_string(tb[USTEER_EVENT_REASON]));
+		snprintf(tmp_buf, 64, ",reason=\"%s\"", blobmsg_get_string(tb[USTEER_EVENT_REASON]));
+		strcat(out_buf, tmp_buf);
 	}
 
 	if (tb[USTEER_EVENT_SELECT_REASON]) {
@@ -104,43 +136,8 @@ static char *usteer_influxdb_get_submission(const char *ev_type, struct blob_att
 		}
 	}
 
-	if (tb[USTEER_EVENT_NODE]) {
-		strcat(out_buf, ",");
-		strcat(out_buf, "local_node=");
-		strcat(out_buf, blobmsg_get_string(tb[USTEER_EVENT_NODE]));
-	}
-
-	if (tb_local[USTEER_EVENT_NODE_STATUS_BSSID]) {
-		strcat(out_buf, ",");
-		strcat(out_buf, "local_node_bssid=");
-		strcat(out_buf, blobmsg_get_string(tb_local[USTEER_EVENT_NODE_STATUS_BSSID]));
-	}
-
-	if (tb_local[USTEER_EVENT_NODE_STATUS_FREQUENCY]) {
-		snprintf(tmp_buf, 64, ",local_node_frequency=%d", blobmsg_get_u32(tb_local[USTEER_EVENT_NODE_STATUS_FREQUENCY]));
-		strcat(out_buf, tmp_buf);
-	}
-
-	if (tb_remote[USTEER_EVENT_NODE_STATUS_NAME]) {
-		strcat(out_buf, ",");
-		strcat(out_buf, "remote_node=");
-		strcat(out_buf, blobmsg_get_string(tb_remote[USTEER_EVENT_NODE_STATUS_NAME]));
-	}
-
-	if (tb_remote[USTEER_EVENT_NODE_STATUS_BSSID]) {
-		strcat(out_buf, ",");
-		strcat(out_buf, "remote_node_bssid=");
-		strcat(out_buf, blobmsg_get_string(tb_remote[USTEER_EVENT_NODE_STATUS_BSSID]));
-	}
-
-	if (tb_remote[USTEER_EVENT_NODE_STATUS_FREQUENCY]) {
-		snprintf(tmp_buf, 64, ",remote_node_frequency=%d", blobmsg_get_u32(tb_remote[USTEER_EVENT_NODE_STATUS_FREQUENCY]));
-		strcat(out_buf, tmp_buf);
-	}
-
 	if (tb[USTEER_EVENT_SIGNAL]) {
-		snprintf(tmp_buf, 64, "signal_local=%d", blobmsg_get_u32(tb[USTEER_EVENT_SIGNAL]));
-		strcat(out_buf, " ");
+		snprintf(tmp_buf, 64, ",signal_local=%d", blobmsg_get_u32(tb[USTEER_EVENT_SIGNAL]));
 		strcat(out_buf, tmp_buf);
 	}
 
