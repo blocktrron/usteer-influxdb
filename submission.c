@@ -75,7 +75,6 @@ int post_url(const char *url, struct uclient_header *headers, int num_headers, c
 	if (request_progress)
 		return 0;
 
-	static struct uclient_data d = { };
 	static struct uclient_cb cb = {
 		.error = request_done,
 		.data_eof = header_done_cb,

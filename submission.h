@@ -1,12 +1,5 @@
 #pragma once
 
-struct uclient_data {
-	/* data that can be passed in by caller and used in custom callbacks */
-	void *custom;
-	int err_code;
-	int done;
-};
-
 struct uclient_header {
 	char *name;
 	char *value;
