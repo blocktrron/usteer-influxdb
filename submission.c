@@ -23,10 +23,11 @@ static const struct ustream_ssl_ops *ssl_ops;
 
 static struct uloop_timeout submission_timer;
 
-struct uclient_header *submission_headers;
-const char *submission_url;
+static const char *submission_url;
+static struct uclient_header *submission_headers;
+static int submission_headers_num;
+
 extern char *submission_queue;
-int submission_headers_num;
 
 
 static void request_done(struct uclient *cl, int err_code) {
