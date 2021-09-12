@@ -15,7 +15,6 @@
 #define TIMEOUT_SEC	10
 #define TIMEOUT_MSEC	(TIMEOUT_SEC * 1000)
 
-static int request_progress = 0;
 static struct uclient *cl;
 
 static struct ustream_ssl_ctx *ssl_ctx;
@@ -32,7 +31,6 @@ extern char *submission_queue;
 
 static void request_done(struct uclient *cl, int err_code) {
 	uclient_disconnect(cl);
-	request_progress = 0;
 	free(submission_queue);
 	submission_queue = NULL;
 	uloop_timeout_set(&submission_timer, TIMEOUT_MSEC);
@@ -72,9 +70,6 @@ static int init_ustream_ssl(void) {
 }
 
 int post_url(const char *url, struct uclient_header *headers, int num_headers, char *post_data) {
-	if (request_progress)
-		return 0;
-
 	static struct uclient_cb cb = {
 		.error = request_done,
 		.data_eof = header_done_cb,
@@ -90,9 +85,6 @@ int post_url(const char *url, struct uclient_header *headers, int num_headers, c
 	}
 
 	init_ustream_ssl();
-
-	request_progress = 1;
-
 
 	cl = uclient_new(url, NULL, &cb);
 	if (!cl)
@@ -132,7 +124,6 @@ int post_url(const char *url, struct uclient_header *headers, int num_headers, c
 	return 0;
 
 err:
-	request_progress = 0;
 	if (cl)
 		uclient_free(cl);
 
