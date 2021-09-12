@@ -127,6 +127,8 @@ err:
 	if (cl)
 		uclient_free(cl);
 
+	uloop_timeout_set(&submission_timer, TIMEOUT_MSEC);
+
 	return 1;
 }
 
