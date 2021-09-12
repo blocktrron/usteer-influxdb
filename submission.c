@@ -94,7 +94,6 @@ int post_url(const char *url, struct uclient_header *headers, int num_headers, c
 		uclient_http_set_ssl_ctx(cl, ssl_ops, ssl_ctx, 1);
 
 	cl->timeout_msecs = TIMEOUT_MSEC;
-	cl->priv = &d;
 	if (uclient_set_timeout(cl, TIMEOUT_MSEC)) {
 			goto err;
 	}
